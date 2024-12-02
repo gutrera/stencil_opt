@@ -18,4 +18,8 @@ Base and optimized version are compared.
                 - program name
                 - k value
   
-- plot.gp : script to generate the plot with gnuplot
+- plot.gp : script to generate the strong scalability plot with gnuplot
+
+- xxx_elapsed.txt : elapsed times from the strong scalability plot
+
+- xxx_output.txt : output from the program from the strong scalibility run with results from the correctness checking, k value and execution times
