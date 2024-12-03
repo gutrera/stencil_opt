@@ -3,7 +3,7 @@
 
 #define N 1024
 
-double OUT[N][N], IN[N][N], W[N][N], OUT0[N][N];
+double OUT[N][N], IN[N][N], W[N][N], OUT0[N][N], check[N][N];
 
 void init()
 {
@@ -24,12 +24,26 @@ int cmp (int k)
   for (int i=k; (i<N-k && equal); i++) {
     for (int j=k; (j<N-k && equal); k++) {
 	//printf("  %.2f %.2f   ", OUT0[i][k], OUT[i][k]);
-	if (OUT0[i][j] != OUT[i][j])
+	if ((check[i][j] != OUT0[i][j]) ||
+	    (check[i][j] != OUT[i][j]))
 		equal=0;
     }
     //printf("\n");
   }
   return equal;
+}
+void base_seq(int k)
+{
+  for (int i=k; i<N-k; i++)
+    for (int j=k; j<N-k; j++) {
+       check[i][j] = 0;
+// Compact representation shown below.
+// Loops (ii,jj) are fully unrolled for
+// each value of k generated in Fig. 1(b)
+       for (int ii=-k; ii<=k; ii++)
+         for (int jj=-k; jj<=k; jj++)
+             check[i][j] += IN[i+ii][j+jj]*W[k+ii][k+jj];
+    }
 }
 
 void base(int k)
@@ -88,6 +102,8 @@ int main(int argc, char *argv[])
 	if (argc>1) k = atoi(argv[1]);
         
 	init();
+	base_seq (k);
+	
 	ini=omp_get_wtime();
 	base (k);
 	end=omp_get_wtime();

@@ -14,7 +14,7 @@ outputmsg=./output.txt
 rm -rf $outputpath 2> /dev/null
 rm -rf $outputmsg 2> /dev/null
 
-export KMP_AFFINITY=scatter
+export KMP_AFFINITY=granularity=fine,compact,1,0
 
 PARS=$np_NMIN
 

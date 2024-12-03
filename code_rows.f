@@ -1,7 +1,7 @@
 module global_vars
     implicit none
     integer, parameter :: N = 1024
-    double precision, dimension(0:N-1, 0:N-1) :: OUT, IN, W, OUT0
+    double precision, dimension(0:N-1, 0:N-1) :: OUT, IN, W, OUT0, check
 end module global_vars
 
 program openmp_fortran
@@ -27,6 +27,9 @@ program openmp_fortran
   call init()
 
   ! Sequential base case
+  call base_seq(k)
+
+  ! Base
   ini = omp_get_wtime()
   call base(k)
   tend = omp_get_wtime()
@@ -70,15 +73,30 @@ contains
 
     do i = k, N - k - 1 
       do j = k, N - k - 1
-        if (OUT0(i, j) /= OUT(i, j)) then
+        if ((check(i, j) /= OUT0(i, j)) .or. (check(i, j) /= OUT(i, j))) then
           equal = .false.
-          print *, "Mismatch at (", i, ",", j, "): OUT0 = ", OUT0(i, j), " OUT = ", OUT(i, j)
           exit
         end if
       end do
       if (.not. equal) exit
     end do
   end function cmp
+
+  subroutine base_seq (k)
+    integer, intent(in) :: k
+    integer :: i, j, ii, jj
+
+    do i = k, N - k - 1
+      do j = k, N - k - 1
+        check(i, j) = 0.0
+        do ii = -k, k
+          do jj = -k, k
+            check(i, j) = check(i, j) + IN(i + ii, j + jj) * W(k + ii, k + jj)
+          end do
+        end do
+      end do
+    end do
+  end subroutine base_seq
 
   subroutine base(k)
     integer, intent(in) :: k
